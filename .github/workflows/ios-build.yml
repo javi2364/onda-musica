@@ -1,0 +1,27 @@
+name: Comprobar Onda iOS
+on:
+  push:
+    paths:
+      - 'ios/OndaNative/**'
+      - '.github/workflows/ios-build.yml'
+  workflow_dispatch:
+
+jobs:
+  compile-ios-simulator:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar XcodeGen
+        run: brew install xcodegen
+      - name: Generar proyecto Xcode
+        working-directory: ios/OndaNative
+        run: xcodegen generate
+      - name: Compilar Onda para simulador sin firmar
+        working-directory: ios/OndaNative
+        run: |
+          xcodebuild -project OndaPersonal.xcodeproj \
+            -scheme OndaPersonal \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO build

@@ -35,4 +35,4 @@ El proyecto no contiene archivos de audio ni códigos de acceso privados.
 
 He preparado un proyecto SwiftUI experimental que incluye **las 281 canciones** y abre la web oficial de YouTube en un `WKWebView` dentro de Onda. **No es una aplicación instalada y todavía no se ha probado en un iPhone.** La reproducción con pantalla bloqueada y sin anuncios **no está garantizada** y no se ha implementado ningún mecanismo para eludir las restricciones de YouTube.
 
-**[Ver proyecto iOS y cómo compilarlo](ios/OndaNative/README.md)** · [Comprobación de compilación](https://github.com/javi2364/onda-musica/actions/workflows/ios-build.yml)
+**[Ver proyecto iOS y cómo compilarlo](ios/OndaNative/README.md)** · [Compilar IPA desde GitHub, sin Mac propio](https://github.com/javi2364/onda-musica/actions/workflows/ios-build.yml)

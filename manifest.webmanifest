@@ -1,11 +1,11 @@
 {
-  "name": "Onda Auto · Coche",
+  "name": "Onda + Brave · Coche",
   "short_name": "Onda",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#0b0b10",
-  "theme_color": "#0b0b10",
+  "background_color": "#090a10",
+  "theme_color": "#0a0913",
   "icons": [
     {
       "src": "icon.svg",
@@ -13,5 +13,6 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "description": "Tu biblioteca de Coche conectada a Brave"
 }

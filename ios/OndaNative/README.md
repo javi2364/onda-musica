@@ -30,6 +30,19 @@ open OndaPersonal.xcodeproj
 
 En Xcode, selecciona el target **OndaPersonal**, elige tu equipo o cuenta Apple en **Signing & Capabilities**, y ejecuta la aplicación en un iPhone físico. Con una cuenta Apple gratuita puedes probarla personalmente, pero el aprovisionamiento puede caducar y exigir renovar la instalación. Esto no es una app ya instalada ni un IPA distribuible.
 
+## Instalar desde un PC Windows sin Mac
+
+También puedes preparar una **IPA sin firmar** desde el repositorio público. GitHub Actions proporciona un Mac remoto gratuito para compilar (el resultado solo sirve para instalar después de firmarlo con tu propia cuenta Apple).
+
+1. Abre [Compilar Onda iPhone](https://github.com/javi2364/onda-musica/actions/workflows/ios-build.yml).
+2. Comprueba que una ejecución termina en verde (si está en rojo, lee el error: todavía no hay IPA funcional).
+3. En la ejecución, ve a **Artifacts** y descarga `OndaPersonal-unsigned-IPA`; descomprime el ZIP y obtén `OndaPersonal-unsigned.ipa`.
+4. En tu PC de casa, instala [AltStore Classic para Windows](https://faq.altstore.io/altstore-classic/how-to-install-altstore-windows) siguiendo **solo la documentación oficial**. Necesitas iTunes/iCloud de Apple, AltServer, un cable para conectar el iPhone y tu propia cuenta de Apple. No compartas tu contraseña conmigo ni la subas a GitHub.
+5. Instala AltStore Classic en el iPhone con AltServer, activa el **Modo desarrollador** en el iPhone cuando lo solicite iOS y, desde AltStore, importa la IPA descargada para firmarla e instalarla.
+6. Con un Apple ID gratuito tendrás que **renovar la firma como máximo cada 7 días** (es un requisito del aprovisionamiento gratuito de Apple). La instalación no significa que YouTube vaya a reproducirse sin anuncios o con la pantalla bloqueada.
+
+**Si GitHub Actions falla, no instales un IPA antiguo**. Este código es experimental y aún no se ha compilado/verificado en un dispositivo físico.
+
 ## Prueba imprescindible en iPhone
 
 1. Abre Onda, selecciona una canción y elige su vídeo en la página de YouTube integrada.

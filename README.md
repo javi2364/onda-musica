@@ -1,31 +1,31 @@
-# Onda Auto — Playlist Coche
+# Onda + Brave — Playlist Coche
 
-Reproductor web musical gratuito para PC e iPhone. Proyecto estático sin instalación ni compilación.
+Proyecto web de biblioteca musical publicado con GitHub Pages.
 
-## Qué incluye
-- 281 canciones importadas de la playlist Coche, con título, artistas, álbum y carátulas.
-- Búsqueda bajo demanda de canciones completas en Audius, con filtros de coincidencia de título, artista y duración.
-- Vistas previas disponibles en el CSV de origen (no equivalen a temas completos).
-- Controles HTML5 y Media Session para móviles, cuando el navegador lo permita.
-- Importación CSV y exportación/importación de asociaciones JSON.
+**Acceso:** https://javi2364.github.io/onda-musica/
 
-**Importante:** las canciones completas dependen de su disponibilidad y de los derechos de uso en Audius; no se garantiza la reproducción completa de todas las pistas. La reproducción continua con el iPhone bloqueado no está garantizada. La búsqueda necesita Internet y los resultados se guardan localmente en cada navegador.
+## Qué está implementado
+- Diseño Onda + Brave, adaptable a PC y iPhone.
+- Las **281 canciones de Coche** con título, artistas, duración y carátulas.
+- Búsqueda y filtrado por artista o título, favoritos persistidos localmente.
+- **6 URLs directas de vídeo verificadas en canales oficiales** de YouTube: `WAOH`, `Miedo y Asco en Madrid`, `Universitaria`, `Chamaquita`, `Bandolero` y `Fumando Serio`.
+- **275 enlaces de búsqueda específicos**, generados automáticamente con título y artista, **no vídeos verificados**.
+- Botón para abrir el contenido seleccionado en Brave (esquema de URL del navegador iOS) y alternativa HTTPS.
+- Opción de guardar una URL verificada por canción en el navegador.
 
-## Publicar gratis con GitHub Pages
+## Cómo usarlo en iPhone
+1. Abre Onda y elige la canción.
+2. Toca **Abrir en Brave**. Si el sistema bloquea el salto de aplicación, abre Onda directamente desde Brave y usa **Abrir en YouTube**.
+3. Si ves una página de resultados, elige el vídeo original.
+4. En Brave, usa el icono de **Playlist** de la barra para añadir ese contenido si lo permite.
+5. Reproduce desde Brave Playlist. La reproducción en segundo plano/pantalla bloqueada depende de Brave, el sitio y la versión.
 
-1. En este repositorio entra en **Settings → Pages**.
-2. En **Build and deployment**, selecciona **Deploy from a branch**.
-3. Elige **main** y la carpeta **/(root)**, luego pulsa **Save**.
-4. Una vez desplegado, abre: https://javi2364.github.io/onda-musica/
+**Límites importantes:** Onda no reproduce vídeos de YouTube en su reproductor ni controla la lista interna de Brave. No puede enviar automáticamente las 281 canciones a Brave Playlist, eliminar anuncios desde su propia página ni reproducir toda la cola por sí sola. Los enlaces de búsqueda no deben interpretarse como coincidencias confirmadas.
 
-En Safari, abre el enlace y usa **Compartir → Añadir a pantalla de inicio** para tener acceso directo como una app.
+## Versiones
+La versión antigua que utilizaba Audius se conserva en `onda-auto-anterior.html`.
 
-## Uso
+## Publicación
+**Settings → Pages → Deploy from a branch → main → /(root)**
 
-1. Abre Onda.
-2. Haz clic en **Buscar audio completo automáticamente** para intentar localizar coincidencias gratuitas en Audius.
-3. Pulsa ▶ para escuchar una fuente disponible.
-4. Si una canción tiene solo vista previa, aparecerá como «30s». Si no hay coincidencia, no se inventará audio.
-5. Para trasladar asociaciones de un navegador a otro, utiliza **Exportar asociaciones** e **Importar asociaciones**.
-
-El código no contiene archivos musicales descargados ni credenciales privadas.
+El proyecto no contiene archivos de audio ni códigos de acceso privados.

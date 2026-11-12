@@ -18,8 +18,8 @@ main{max-width:1150px;margin:auto;padding:22px 24px 60px}.top{display:flex;align
 </style></head><body><main>
 <header class="top"><div class="brand"><span>◉</span> ONDA <span style="background:#27202e;color:#c7adff;box-shadow:none;width:auto;height:auto;border-radius:8px;padding:3px 7px;font-size:10px;letter-spacing:0">AUTO</span></div><div class="mininote">Tu música · sin descargas manuales</div></header>
 <section class="hero"><div class="heroart">♫</div><div><div class="eyebrow">Playlist importada de Spotify</div><h1>Coche</h1><p>281 canciones importadas. Onda busca pistas completas en Audius y evita los resultados que no coincidan con el artista original. Si no encuentra una, conserva la vista previa y los enlaces oficiales.</p><div class="counts"><div class="pill"><b id="ct-total">281</b> canciones</div><div class="pill"><b id="ct-full">0</b> completas encontradas</div><div class="pill"><b id="ct-preview">278</b> vistas previas</div></div></div></section>
-<div class="info"><strong>Cómo funciona:</strong> pulsa <b>Buscar audio completo</b>. La búsqueda gratuita requiere conexión y puede tardar; guardaré los resultados en este navegador. No se descarga música ni se inventan coincidencias. En iPhone prueba Safari con la pantalla bloqueada, pero el paso automático entre canciones puede depender de iOS. <strong>Spotify oficial</strong> abre un reproductor incrustado, sin garantía de reproducción completa o en segundo plano.</div>
-<div class="actions"><button id="scan" class="btn primary">⚡ Buscar audio completo automáticamente</button><button id="stop" class="btn red hidden">Detener búsqueda</button><button id="export" class="btn">↓ Guardar asociaciones</button><button id="import" class="btn">↑ Importar asociaciones</button><button id="choosecsv" class="btn">＋ Importar otro CSV</button><input class="hidden" id="filemaps" type="file" accept="application/json,.json"/><input class="hidden" id="filecsv" type="file" accept=".csv,text/csv"/></div>
+<div class="info"><strong>Cómo funciona:</strong> pulsa <b>Buscar audio completo</b>. La búsqueda gratuita requiere conexión y puede tardar; mantén la pantalla encendida durante la búsqueda en iPhone. Puedes comprobar por separado la conexión a Audius. Guardaré los resultados en este navegador. No se descarga música ni se inventan coincidencias. En iPhone prueba Safari con la pantalla bloqueada, pero el paso automático entre canciones puede depender de iOS. <strong>Spotify oficial</strong> abre un reproductor incrustado, sin garantía de reproducción completa o en segundo plano.</div>
+<div class="actions"><button id="scan" class="btn primary">⚡ Buscar audio completo automáticamente</button><button id="checkapi" class="btn">🔎 Comprobar Audius</button><button id="resetmisses" class="btn">↻ Repetir descartadas</button><button id="stop" class="btn red hidden">Detener búsqueda</button><button id="export" class="btn">↓ Guardar asociaciones</button><button id="import" class="btn">↑ Importar asociaciones</button><button id="choosecsv" class="btn">＋ Importar otro CSV</button><input class="hidden" id="filemaps" type="file" accept="application/json,.json"/><input class="hidden" id="filecsv" type="file" accept=".csv,text/csv"/></div>
 <div class="small muted" id="status" role="status">Lista preparada. Pulsa una canción para reproducir su audio disponible.</div><div class="bar"><div id="scanbar"></div></div>
 <div class="controls"><h2>Mis canciones</h2><input id="q" class="search" type="search" placeholder="Buscar canción o artista..."/><select id="filter" class="filter"><option value="all">Todas</option><option value="full">Completas</option><option value="preview">Vista previa</option><option value="none">Sin audio</option></select></div>
 <div id="list" role="list"></div>
@@ -35,8 +35,8 @@ const $=id=>document.getElementById(id);
 const list=$('list'), audio=$('audio');
 let songs=SONGS, index=-1, scanStop=false, scanning=false, renderTimer=0, filtered=[];
 let map={}, negative={};
-try { map=JSON.parse(localStorage.getItem('onda-map-v2')||'{}'); negative=JSON.parse(localStorage.getItem('onda-neg-v2')||'{}'); } catch {};
-const save=()=>{try{localStorage.setItem('onda-map-v2',JSON.stringify(map));localStorage.setItem('onda-neg-v2',JSON.stringify(negative));}catch(e){console.warn('El navegador no permite guardar cambios',e)}};
+try { map=JSON.parse(localStorage.getItem('onda-map-v2')||'{}'); negative=JSON.parse(localStorage.getItem('onda-neg-v3')||'{}'); } catch {};
+const save=()=>{try{localStorage.setItem('onda-map-v2',JSON.stringify(map));localStorage.setItem('onda-neg-v3',JSON.stringify(negative));}catch(e){console.warn('El navegador no permite guardar cambios',e)}};
 const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/&/g,' y ').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');
 const simple=s=>norm(String(s||'').replace(/\((?:feat\.?|ft\.?)[^)]*\)/ig,'').replace(/\[(?:feat\.?|ft\.?)[^\]]*\]/ig,''));
 const firstArtist=s=>String(s||'').split(',')[0].trim();
@@ -81,14 +81,63 @@ if(c.is_streamable===false||c.access?.stream===false)return -1;
 return (titleMatch*.6+artistMatch*.4)+(duration&&expected?.04:0);
 }
 async function queryAudius(q){const url='https://api.audius.co/v1/tracks/search?'+new URLSearchParams({query:q,limit:'15'});const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),14000);try{const resp=await fetch(url,{signal:controller.signal});if(!resp.ok)throw Error('HTTP '+resp.status);const body=await resp.json();return Array.isArray(body.data)?body.data:(Array.isArray(body.data?.tracks)?body.data.tracks:[])}finally{clearTimeout(timeout)}}
-async function resolve(t){if(isFull(t))return 'found';if(negative[k(t)]&&Date.now()-negative[k(t)]<14*86400000)return 'missing';
-const candidateQs=[t.title+' '+firstArtist(t.artist),t.title];let best=null,score=-1;
-for(const q of candidateQs){const results=await queryAudius(q);for(const found of results){const val=goodMatch(t,found);if(val>score){best=found;score=val}}if(score>=1)break;}
-if(score>=.98&&best?.id){map[k(t)]={id:String(best.id),title:best.title,artist:best.user?.name||best.owner?.name||'',duration:best.duration||null,source:'audius'};delete negative[k(t)];save();return 'found'}negative[k(t)]=Date.now();save();return 'missing'}
+async function resolve(t){
+ if(isFull(t))return 'found';
+ if(negative[k(t)]&&Date.now()-negative[k(t)]<2*86400000)return 'cached';
+ const candidateQs=[t.title+' '+firstArtist(t.artist),t.title];let best=null,score=-1,seen=0;
+ for(const q of candidateQs){
+  const results=await queryAudius(q);seen+=results.length;
+  for(const track of results){const val=goodMatch(t,track);if(val>score){best=track;score=val}}
+  if(score>=1)break;
+ }
+ if(score>=.98&&best?.id){
+  map[k(t)]={id:String(best.id),title:best.title,artist:best.user?.name||best.owner?.name||'',duration:best.duration||null,source:'audius'};
+  delete negative[k(t)];save();return 'found';
+ }
+ negative[k(t)]=Date.now();save();return seen?'rejected':'empty';
+}
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-$('scan').onclick=async()=>{if(scanning)return;scanning=true;scanStop=false;$('scan').disabled=true;$('stop').classList.remove('hidden');let found=0,missing=0,errors=0,done=0;const candidates=songs.filter(t=>!isFull(t));const total=candidates.length;
-for(const t of candidates){if(scanStop)break;try{const r=await resolve(t);if(r==='found')found++;else missing++}catch(e){errors++;console.warn('Audius',t.title,e);if(errors>=5){setStatus('Varias consultas fallaron: posible bloqueo de red, CORS o límite de la API. Se ha detenido la búsqueda.');break}}done++;$('scanbar').style.width=(done/Math.max(total,1)*100)+'%';if(done%5===0||done===total){setStatus(`Búsqueda ${done}/${total} · ${found} nuevas completas · ${missing} no encontradas · ${errors} errores`);counts();updateList()}await sleep(350)}
-scanning=false;$('scan').disabled=false;$('stop').classList.add('hidden');counts();render();if(errors<5)setStatus(`Finalizada: ${done}/${total} comprobadas; ${found} nuevas canciones completas encontradas. ${missing} sin coincidencia. Ninguna canción se ha descargado.`)};
+$('checkapi').onclick=async()=>{
+ if(scanning){setStatus('La búsqueda está en marcha; deténla antes de comprobar la conexión.');return}
+ $('checkapi').disabled=true;setStatus('Comprobando conexión con Audius…');
+ try{
+  const results=await queryAudius('lofi');
+  setStatus(results.length?'Audius responde correctamente ('+results.length+' resultados de prueba). Si no hay completas, los temas no aparecen con identidad y duración fiables en su catálogo.':'Audius responde, pero esta prueba ha devuelto 0 resultados. Comprueba la disponibilidad del servicio.');
+ }catch(e){setStatus('No se pudo consultar Audius: '+(e?.message||'error de red')+'. Prueba con otra red o revisa bloqueos del navegador.')}
+ finally{$('checkapi').disabled=false}
+};
+$('resetmisses').onclick=()=>{
+ if(scanning){setStatus('Detén la búsqueda antes de borrar los descartes.');return}
+ negative={};save();setStatus('Descartes anteriores borrados. Puedes repetir la búsqueda de las canciones que no aparecieron.');
+ $('scanbar').style.width='0%';
+};
+$('scan').onclick=async()=>{
+ if(scanning)return;
+ scanning=true;scanStop=false;$('scan').disabled=true;$('stop').classList.remove('hidden');
+ let found=0,empty=0,rejected=0,cached=0,errors=0,done=0;
+ const candidates=songs.filter(t=>!isFull(t)),total=candidates.length;
+ for(const t of candidates){
+  if(scanStop)break;
+  try{
+   const result=await resolve(t);
+   if(result==='found')found++;
+   else if(result==='empty')empty++;
+   else if(result==='rejected')rejected++;
+   else if(result==='cached')cached++;
+  }catch(e){
+   errors++;console.warn('Audius',t.title,e);
+   if(errors>=5){setStatus('Consultas fallidas repetidas: '+(e?.message||'red/API')+'. Se ha detenido para no gastar datos. Usa «Comprobar Audius».');break}
+  }
+  done++;$('scanbar').style.width=(done/Math.max(total,1)*100)+'%';
+  if(done%5===0||done===total){
+   setStatus('Búsqueda '+done+'/'+total+' · '+found+' completas · '+empty+' sin resultados · '+rejected+' coincidencias rechazadas · '+cached+' descartes guardados · '+errors+' errores. Última: '+t.title);
+   counts();updateList();
+  }
+  await sleep(350);
+ }
+ scanning=false;$('scan').disabled=false;$('stop').classList.add('hidden');counts();render();
+ if(errors<5)setStatus('Revisión '+done+'/'+total+': '+found+' completas, '+empty+' sin resultados en Audius, '+rejected+' coincidencias no fiables, '+cached+' descartes anteriores, '+errors+' errores. No se han descargado archivos.');
+};
 $('stop').onclick=()=>{scanStop=true;setStatus('Deteniendo al finalizar la consulta en curso…')};
 $('export').onclick=()=>{const payload={version:2,exportedAt:new Date().toISOString(),matches:map,notFound:negative};download('onda_asociaciones.json',JSON.stringify(payload,null,2),'application/json')};
 $('import').onclick=()=>$('filemaps').click();$('filemaps').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{const r=JSON.parse(await f.text());const m=r.matches||r;if(typeof m!=='object'||!m)throw Error('Formato inesperado');map={...map,...m};save();render();setStatus('Asociaciones importadas: '+Object.keys(m).length)}catch{setStatus('No se pudo leer el archivo JSON de asociaciones.')}e.target.value=''};
